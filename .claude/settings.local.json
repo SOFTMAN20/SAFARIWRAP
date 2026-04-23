@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(npx next:*)",
+      "Bash(find \"D:/eliot/safariwrap-web/app/\\(admin\\)\" -type f)",
+      "Bash(ls -la \"D:/eliot/safariwrap-web/app/\\(admin\\)/\")",
+      "Bash(dir \"D:\\\\eliot\\\\safariwrap-web\\\\app\\\\\\(admin\\)\" /s /b)"
+    ]
+  }
+}

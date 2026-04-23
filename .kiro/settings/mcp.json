@@ -1,0 +1,47 @@
+{
+  "mcpServers": {
+    "supabase-safariwrap": {
+      "url": "https://mcp.supabase.com/mcp?project_ref=uauymnvbsdldfpeuvtxy",
+      "headers": {
+        "Authorization": "Bearer sbp_01234eac81d95c6d5b47d85b355eea421d0c3f90"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "execute_sql"
+      ]
+    },
+    "nextjs-docs": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-fetch"
+      ],
+      "env": {
+        "ALLOWED_DOMAINS": "nextjs.org,react.dev"
+      },
+      "disabled": true,
+      "autoApprove": []
+    },
+    "shadcn-docs": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-fetch"
+      ],
+      "env": {
+        "ALLOWED_DOMAINS": "ui.shadcn.com"
+      },
+      "disabled": false,
+      "autoApprove": []
+    },
+    "web-docs": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-fetch"
+      ],
+      "env": {
+        "ALLOWED_DOMAINS": "developer.mozilla.org,tanstack.com,lucide.dev"
+      },
+      "disabled": true,
+      "autoApprove": []
+    }
+  }
+}
