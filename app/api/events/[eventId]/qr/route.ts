@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { generateQRCodeForEvent, generateQRImageUrl } from '@/lib/qr-generator';
+import { generateShortCode, generateReviewUrl, getQRCodeUrl } from '@/lib/qr-generator';
 
 export async function GET(
   request: NextRequest,
@@ -60,18 +60,31 @@ export async function GET(
     let qrCode = existingQR;
 
     if (!qrCode) {
-      const result = await generateQRCodeForEvent(eventId);
-      if (!result.success) {
+      // Generate new QR code
+      const shortCode = generateShortCode();
+      const codeUrl = generateReviewUrl(shortCode);
+      
+      const { data: newQR, error: insertError } = await supabase
+        .from('qr_codes')
+        .insert({
+          event_id: eventId,
+          short_code: shortCode,
+          code_url: codeUrl,
+        })
+        .select()
+        .single();
+
+      if (insertError) {
         return NextResponse.json(
-          { error: result.error },
+          { error: 'Failed to create QR code' },
           { status: 500 }
         );
       }
-      qrCode = result.data;
+      qrCode = newQR;
     }
 
     // Generate QR image URL
-    const imageUrl = generateQRImageUrl(qrCode.code_url);
+    const imageUrl = getQRCodeUrl(qrCode.short_code);
 
     return NextResponse.json({
       data: {
@@ -139,21 +152,40 @@ export async function POST(
     }
 
     // Force regenerate QR code
-    const result = await generateQRCodeForEvent(eventId);
-    if (!result.success) {
+    const shortCode = generateShortCode();
+    const codeUrl = generateReviewUrl(shortCode);
+    
+    // Delete old QR code if exists
+    await supabase
+      .from('qr_codes')
+      .delete()
+      .eq('event_id', eventId);
+    
+    // Create new QR code
+    const { data: newQR, error: insertError } = await supabase
+      .from('qr_codes')
+      .insert({
+        event_id: eventId,
+        short_code: shortCode,
+        code_url: codeUrl,
+      })
+      .select()
+      .single();
+
+    if (insertError) {
       return NextResponse.json(
-        { error: result.error },
+        { error: 'Failed to regenerate QR code' },
         { status: 500 }
       );
     }
 
-    const imageUrl = generateQRImageUrl(result.data.code_url);
+    const imageUrl = getQRCodeUrl(newQR.short_code);
 
     return NextResponse.json({
       data: {
-        qrCode: result.data,
+        qrCode: newQR,
         imageUrl,
-        reviewUrl: result.data.code_url
+        reviewUrl: newQR.code_url
       }
     });
 
